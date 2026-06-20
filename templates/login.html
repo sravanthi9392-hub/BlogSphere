@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow border-0 mt-5">
+                <div class="card-body p-4">
+                    <h3 class="text-center fw-bold mb-4">Welcome Back</h3>
+                    <form action="{{ url_for('login') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Username Input</label>
+                            <input type="text" name="username" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password Key</label>
+                            <input type="password" name="password" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100 mt-2">Sign In securely</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <small class="text-muted">New entity? <a href="{{ url_for('register') }}">Create an account here</a></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

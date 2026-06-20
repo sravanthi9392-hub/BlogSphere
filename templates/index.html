@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">Explore Content Feed</h2>
+                {% if category_filter or search_query %}
+                    <a href="{{ url_for('index') }}" class="btn btn-sm btn-secondary">Clear Filters</a>
+                {% endif %}
+            </div>
+
+            <form action="{{ url_for('index') }}" method="GET" class="mb-4">
+                <div class="input-group shadow-sm">
+                    <input type="text" name="search" class="form-control" placeholder="Search title, context, or username author..." value="{{ search_query }}">
+                    {% if category_filter %}
+                        <input type="hidden" name="category" value="{{ category_filter }}">
+                    {% endif %}
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+
+            <div class="row g-3">
+                {% if posts %}
+                    {% for post in posts %}
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm transition-card">
+                            <div class="card-body d-flex flex-column">
+                                <span class="badge bg-secondary align-self-start mb-2">{{ post.category }}</span>
+                                <h4 class="card-title fw-bold"><a href="{{ url_for('view_post', post_id=post.id) }}" class="text-decoration-none text-dark">{{ post.title }}</a></h4>
+                                <p class="card-text text-muted text-truncate-3 flex-grow-1">{{ post.content[:140] }}...</p>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <small>By <a href="{{ url_for('profile', username=post.author) }}">{{ post.author }}</a></small>
+                                    
+                                    <button class="btn btn-sm btn-outline-danger like-btn" data-post-id="{{ post.id }}">
+                                        ❤️ <span id="like-count-{{ post.id }}">{{ post.likes }}</span>
+                                    </button>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted fs-4">No blogs matching parameters found.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if total_pages > 1 %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% for p in range(1, total_pages + 1) %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('index', page=p, search=search_query, category=category_filter) }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white fw-bold">Categories</div>
+                <div class="list-group list-group-flush">
+                    {% for cat in categories %}
+                    <a href="{{ url_for('index', category=cat, search=search_query) }}" class="list-group-item list-group-item-action {% if category_filter == cat %}active{% endif %}">
+                        {{ cat }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white fw-bold">🔥 Popular Section</div>
+                <div class="list-group list-group-flush">
+                    {% for pop in popular_posts %}
+                    <a href="{{ url_for('view_post', post_id=pop.id) }}" class="list-group-item list-group-item-action text-truncate">
+                        <strong>{{ pop.title }}</strong> <small class="text-muted">({{ pop.likes }} Likes)</small>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

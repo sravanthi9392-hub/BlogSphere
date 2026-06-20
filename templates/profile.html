@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="card shadow-sm mb-4 border-0 p-4 bg-light">
+        <div class="d-flex align-items-center gap-3">
+            <div class="bg-dark text-white rounded-circle p-3 fs-3 fw-bold">@</div>
+            <div>
+                <h2 class="fw-bold m-0">Account Profile: {{ profile_user.username }}</h2>
+                <small class="text-muted">User verification registration date: {{ profile_user.created_at }}</small>
+            </div>
+        </div>
+        <hr class="my-3">
+        <div class="row text-center">
+            <div class="col-6 border-end">
+                <h5>{{ stats.posts_count }}</h5>
+                <small class="text-muted">Posts Created</small>
+            </div>
+            <div class="col-6">
+                <h5>{{ stats.comments_count }}</h5>
+                <small class="text-muted">Comments Contributed</small>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="fw-bold mb-3">Posts Created by @{{ profile_user.username }}</h4>
+    <div class="row g-3">
+        {% if user_posts %}
+            {% for post in user_posts %}
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="badge bg-secondary mb-2">{{ post.category }}</span>
+                        <h5><a href="{{ url_for('view_post', post_id=post.id) }}" class="text-decoration-none text-dark fw-bold">{{ post.title }}</a></h5>
+                        <p class="text-muted small">{{ post.content[:100] }}...</p>
+                        <small class="text-muted d-block mt-2">❤️ {{ post.likes }} Engagement metrics</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted ms-2">This account hasn't written any blogs yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

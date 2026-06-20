@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold">Greetings, {{ session['username'] }}! Workspace Panel</h2>
+            <p class="text-muted">Analyze your metrics, manage drafts, or publish new entries below.</p>
+        </div>
+    </div>
+
+    <div class="row g-3 text-center mb-5">
+        <div class="col-md-6">
+            <div class="card bg-primary text-white shadow-sm py-4">
+                <h3>📖 {{ post_count }}</h3>
+                <span>Total Published Posts</span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-success text-white shadow-sm py-4">
+                <h3>💬 {{ comment_count }}</h3>
+                <span>Comments Written</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h3 class="fw-bold m-0">Your Blog Content Catalog</h3>
+            <a href="{{ url_for('create_post') }}" class="btn btn-primary">+ Build a New Blog Entry</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle m-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Title Name</th>
+                        <th>Category Type</th>
+                        <th>Created Timestamp</th>
+                        <th>Engagement</th>
+                        <th class="text-end">Actions Executable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if my_posts %}
+                        {% for post in my_posts %}
+                        <tr>
+                            <td><a href="{{ url_for('view_post', post_id=post.id) }}" class="fw-bold text-decoration-none">{{ post.title }}</a></td>
+                            <td><span class="badge bg-secondary">{{ post.category }}</span></td>
+                            <td><small class="text-muted">{{ post.created_at[:10] }}</small></td>
+                            <td>❤️ {{ post.likes }}</td>
+                            <td class="text-end">
+                                <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                                <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No content deployed yet. Go publish your first blog!</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% block dashboard_block %}{% endblock %}
+{% endblock %}

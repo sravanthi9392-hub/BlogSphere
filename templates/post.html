@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <article class="card shadow-sm p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge bg-primary px-3 py-2 fs-6">{{ post.category }}</span>
+                    {% if session.get('user_id') == post.author_id %}
+                        <div>
+                            <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-sm btn-outline-warning">Modify Content</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <h1 class="fw-extrabold my-2 display-5 font-weight-bold">{{ post.title }}</h1>
+                <p class="text-muted small mb-4">
+                    Written by <a href="{{ url_for('profile', username=post.author) }}" class="fw-bold">@{{ post.author }}</a> 
+                    • Created: {{ post.created_at }} 
+                    {% if post.created_at != post.updated_at %} • Updated: {{ post.updated_at }}{% endif %}
+                </p>
+                <hr>
+                <div class="fs-5 line-height-md my-4" style="white-space: pre-wrap;">{{ post.content }}</div>
+                <hr>
+                <div class="d-flex align-items-center justify-content-between">
+                    <button class="btn btn-danger like-btn" data-post-id="{{ post.id }}">
+                        ❤️ Endorse Post (<span id="like-count-{{ post.id }}">{{ post.likes }}</span>)
+                    </button>
+                </div>
+            </article>
+
+            <section class="card shadow-sm p-4">
+                <h4 class="fw-bold mb-4">Interactive Comments ({{ comments|length }})</h4>
+                
+                {% if session.get('user_id') %}
+                <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST" class="mb-4">
+                    <div class="mb-3">
+                        <textarea name="comment" class="form-control" rows="3" placeholder="Share your perspective regarding this insight..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-dark btn-sm">Submit Comment</button>
+                </form>
+                {% else %}
+                <div class="alert alert-warning">Please <a href="{{ url_for('login') }}">login</a> to add comments.</div>
+                {% endif %}
+
+                <div class="comment-timeline flex-column d-flex gap-3">
+                    {% for c in comments %}
+                    <div class="p-3 border rounded bg-light" id="comment-display-{{ c.id }}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong class="text-primary">@{{ c.commenter }}</strong>
+                            <small class="text-muted">{{ c.created_at }}</small>
+                        </div>
+                        <p class="m-0 text-dark">{{ c.comment }}</p>
+                        {% if session.get('user_id') == c.user_id %}
+                        <div class="mt-2 text-end">
+                            <button class="btn btn-sm text-warning p-0 me-2 edit-comment-btn" data-comment-id="{{ c.id }}">Edit</button>
+                            
+                            <form action="{{ url_for('delete_comment', comment_id=c.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this response forever?');">
+                                <button class="btn btn-sm text-danger p-0" type="submit">Delete</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if session.get('user_id') == c.user_id %}
+                    <form id="comment-edit-form-{{ c.id }}" action="{{ url_for('edit_comment', comment_id=c.id) }}" method="POST" class="d-none p-3 border rounded bg-light">
+                        <div class="mb-2">
+                            <textarea name="comment" class="form-control" rows="2" required>{{ c.comment }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-sm">Save</button>
+                        
+                        <button type="button" class="btn btn-secondary btn-sm cancel-comment-btn" data-comment-id="{{ c.id }}">Cancel</button>
+                    </form>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
